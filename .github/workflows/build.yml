@@ -7,58 +7,58 @@ on:
     types: [published]
 
 jobs:
-  fmt:
-    name: Format
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          override: true
-          components: rustfmt
-      - uses: actions-rs/cargo@v1
-        with:
-          command: fmt
-          args: --all -- --check
+  # fmt:
+  #   name: Format
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - uses: actions-rs/toolchain@v1
+  #       with:
+  #         profile: minimal
+  #         override: true
+  #         components: rustfmt
+  #     - uses: actions-rs/cargo@v1
+  #       with:
+  #         command: fmt
+  #         args: --all -- --check
 
-  clippy:
-    name: Clippy
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          override: true
-          components: clippy
-      - uses: actions-rs/clippy-check@v1
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          args: --all-targets --all-features -- -F warnings
+  # clippy:
+  #   name: Clippy
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - uses: actions-rs/toolchain@v1
+  #       with:
+  #         profile: minimal
+  #         override: true
+  #         components: clippy
+  #     - uses: actions-rs/clippy-check@v1
+  #       with:
+  #         token: ${{ secrets.GITHUB_TOKEN }}
+  #         args: --all-targets --all-features -- -F warnings
 
-  test:
-    name: Unitest (${{ matrix.os }})
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [macos-latest, ubuntu-latest, windows-latest]
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          override: true
-          components: clippy
-      - uses: actions-rs/cargo@v1
-        env:
-          RUST_BACKTRACE: full
-          RUSTFLAGS: -F warnings
-        with:
-          command: test
-          args: --all --all-features
-      - name: "Ensure Cargo.lock is not modified"
-        run: git diff --exit-code Cargo.lock
+  # test:
+  #   name: Unitest (${{ matrix.os }})
+  #   runs-on: ${{ matrix.os }}
+  #   strategy:
+  #     matrix:
+  #       os: [macos-latest, ubuntu-latest, windows-latest]
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - uses: actions-rs/toolchain@v1
+  #       with:
+  #         profile: minimal
+  #         override: true
+  #         components: clippy
+  #     - uses: actions-rs/cargo@v1
+  #       env:
+  #         RUST_BACKTRACE: full
+  #         RUSTFLAGS: -F warnings
+  #       with:
+  #         command: test
+  #         args: --all --all-features
+  #     - name: "Ensure Cargo.lock is not modified"
+  #       run: git diff --exit-code Cargo.lock
 
   build-release:
     name: Build release Executable (${{ matrix.os }} - ${{ matrix.target }})
@@ -66,16 +66,16 @@ jobs:
     strategy:
       matrix:
         include:
-          # Build for Linux x64
-          - os: ubuntu-latest
-            target: x86_64-unknown-linux-musl
-          # Build for MacOS
-          - os: macos-latest
-            target: x86_64-apple-darwin
-          # Build for Windows
-          - os: windows-latest
-            target: x86_64-pc-windows-msvc
-          # Build for Raspberry PI 2/3/4
+          # # Build for Linux x64
+          # - os: ubuntu-latest
+          #   target: x86_64-unknown-linux-musl
+          # # Build for MacOS
+          # - os: macos-latest
+          #   target: x86_64-apple-darwin
+          # # Build for Windows
+          # - os: windows-latest
+          #   target: x86_64-pc-windows-msvc
+          # # Build for Raspberry PI 2/3/4
           - os: ubuntu-latest
             target: armv7-unknown-linux-gnueabihf
     env:
@@ -93,6 +93,7 @@ jobs:
         with:
           command: build
           args: --release --bin simple-http-server --locked --target ${{ matrix.target }}
+          use-cross: true
       - uses: actions/upload-artifact@v2
         with:
           name: ${{ matrix.target }}-simple-http-server${{ env.BINARY_EXTENSION }}
